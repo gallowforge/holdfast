@@ -1,0 +1,30 @@
+{
+  "note": "The figures in the numbers picture. Count them again before a release: the tests with `go test ./... -v | grep -c '^=== RUN'` plus the page's test count from `npm test`, the size from the Linux binary in dist/.",
+  "figures": [
+    {
+      "value": "10",
+      "label": "kinds of check",
+      "more": "files, ports, URLs, DNS, commands"
+    },
+    {
+      "value": "4",
+      "label": "tools for the agent",
+      "more": "remember, recall, verify, retract"
+    },
+    {
+      "value": "0",
+      "label": "dependencies",
+      "more": "the Go standard library, nothing else"
+    },
+    {
+      "value": "1,647",
+      "label": "tests",
+      "more": "run on Linux and on macOS"
+    },
+    {
+      "value": "1",
+      "label": "file to install",
+      "more": "an 8 MB static binary"
+    }
+  ]
+}

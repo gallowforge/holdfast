@@ -1,0 +1,81 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false   # no go.sum: there are no dependencies to cache
+      - name: the page (typecheck, tests, build)
+        working-directory: web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm test
+          npm run build
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - name: vet and test
+        run: |
+          go vet ./...
+          go test -race -count=1 ./...
+      - name: build every release target
+        run: |
+          for t in linux/amd64 linux/arm64 darwin/arm64 darwin/amd64; do
+            CGO_ENABLED=0 GOOS=${t%/*} GOARCH=${t#*/} go build -trimpath -o /dev/null ./cmd/holdfast
+          done
+          CGO_ENABLED=0 go build -trimpath -o bin/holdfast ./cmd/holdfast
+      - name: the page inside the binary carries no demo code
+        run: |
+          if grep -rqE 'holdfastDemo|holdfast\.wasm|wasm_exec' internal/web/dist; then
+            echo "the embedded page includes the demo's loader"; exit 1
+          fi
+      - name: the binary that ships, end to end (command line, MCP server, ledger)
+        run: HOLDFAST_BIN="$PWD/bin/holdfast" go test -count=1 -v ./e2e
+      - name: the live demo builds
+        run: make pages
+      - uses: actions/upload-artifact@v7
+        with:
+          name: holdfast-linux-amd64
+          path: bin/holdfast
+
+  # The store locks files and resolves paths, and both differ on macOS, so the
+  # tests run there too before a macOS binary is published.
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: vet and test
+        run: |
+          go vet ./...
+          go test -count=1 ./...
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: scan the history for secrets
+        run: |
+          docker run --rm -v "$PWD:/repo" \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
+            ghcr.io/gitleaks/gitleaks:latest git /repo --no-banner --redact

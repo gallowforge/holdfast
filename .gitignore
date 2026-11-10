@@ -1,0 +1,9 @@
+/bin/
+/dist/
+/pages/
+/web/node_modules/
+/docs/readme/src/node_modules/
+/internal/web/dist/*
+!/internal/web/dist/.gitkeep
+*.test
+coverage.out
