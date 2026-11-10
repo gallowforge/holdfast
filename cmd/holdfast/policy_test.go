@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/gallowforge/holdfast/internal/fact"
 )
 
 const (
@@ -328,7 +330,7 @@ func TestAllowWidensThePolicyAndProvesWhatWasWaiting(t *testing.T) {
 	got := s.ok("allow", "files", s.outside)
 	file := filepath.Join(s.outside, "data.txt")
 	want := "Allowed: files " + s.outside + "\n\nThe facts that were blocked, checked again:\n" +
-		"HOLDS     " + s.blocked.ID + "  The data is there\n" + pad + "proof: " + file + " exists · checked just now\n"
+		"HOLDS     " + s.blocked.ID + "  The data is there\n" + pad + "proof: " + fact.CleanLine(file+" exists", fact.MaxDetail) + " · checked just now\n"
 	if calm(got.out) != want {
 		t.Errorf("allow said:\n%s\nwant:\n%s", got.out, want)
 	}
