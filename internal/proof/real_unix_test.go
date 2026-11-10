@@ -4,6 +4,7 @@ package proof
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
@@ -383,6 +384,7 @@ func TestRealNetwork(t *testing.T) {
 	tls.Config.ErrorLog = log.New(io.Discard, "", 0)
 	tls.StartTLS()
 	defer tls.Close()
+	judged(t, tls.Listener.Addr().String())
 	both(t, o, parent, p, "http 200 "+tls.URL+"/", fact.Broken, tls.URL+"/ did not answer: the TLS certificate was not accepted")
 
 	// A caller that stops waiting gets "not checked", never a verdict.
@@ -393,6 +395,23 @@ func TestRealNetwork(t *testing.T) {
 		if ev := Run(ctx, o, p, parse(t, line)); ev.Status != fact.Blocked || ev.Detail != stopped {
 			t.Errorf("%s under a stopped caller\n got %s: %s\nwant blocked: %s", line, ev.Status, ev.Detail, stopped)
 		}
+	}
+}
+
+// judged has the machine judge one certificate before a check that is timed
+// does. The first judgement after a start loads the list of authorities the
+// machine trusts, and on a macOS machine that has only just started that alone
+// has taken longer than the five seconds a check is given. The check would
+// then say, truthfully, that nobody answered in time. What is tested above is
+// what it says about the certificate.
+func judged(t *testing.T, addr string) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(bg, time.Minute)
+	defer cancel()
+	c, err := (&tls.Dialer{}).DialContext(ctx, "tcp", addr)
+	if err == nil {
+		c.Close()
+		t.Fatalf("a certificate nobody vouches for was accepted from %s", addr)
 	}
 }
 
