@@ -289,7 +289,7 @@ Every run of a check produces one piece of evidence: a status (`holds`, `broken`
 {"t":"…","op":"evidence","id":"f-9e5ar5","ev":{"status":"holds","detail":"localhost:5432 accepts connections","at":"…","ms":0}}
 ```
 
-The detail is at most 300 characters. It is built from:
+The detail is at most 300 characters. When a blocked check's line would be longer, as with a file deep inside long folder names, the path or address in the reason loses its middle and the command a person would run is kept whole; a command that cannot fit is not suggested at all. The detail is built from:
 
 - what the check itself names: the path, the address, the host, the command;
 - the text or expression from the check, cut to 60 characters;

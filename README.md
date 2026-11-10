@@ -4,7 +4,7 @@ A coding agent keeps notes between sessions: the port the API listens on, the Go
 
 <p align="center"><a href="https://gallowforge.github.io/holdfast/"><b>Live demo</b></a> &nbsp;·&nbsp; <a href="#quickstart"><b>Quickstart</b></a> &nbsp;·&nbsp; <a href="#how-it-works">How it works</a> &nbsp;·&nbsp; <a href="docs/checks.md">Checks</a> &nbsp;·&nbsp; <a href="docs/agents.md">Agents</a> &nbsp;·&nbsp; <a href="https://github.com/gallowforge/holdfast/releases">Releases</a></p>
 
-<a href="docs/checks.md#gh-dark-mode-only"><picture><source media="(max-width: 767px)" srcset="docs/readme/numbers-dark-phone.webp 3x"><source srcset="docs/readme/numbers-dark.webp 2x"><img src="docs/readme/numbers-dark.webp" width="840" alt="Holdfast in five figures: 10 kinds of check (files, ports, URLs, DNS, commands), 4 tools for the agent (remember, recall, verify, retract), 0 dependencies (the Go standard library, nothing else), 1,647 tests (run on Linux and on macOS), and 1 file to install (an 8 MB static binary)." loading="lazy"></picture></a><a href="docs/checks.md#gh-light-mode-only"><picture><source media="(max-width: 767px)" srcset="docs/readme/numbers-light-phone.webp 3x"><source srcset="docs/readme/numbers-light.webp 2x"><img src="docs/readme/numbers-light.webp" width="840" alt="Holdfast in five figures: 10 kinds of check (files, ports, URLs, DNS, commands), 4 tools for the agent (remember, recall, verify, retract), 0 dependencies (the Go standard library, nothing else), 1,647 tests (run on Linux and on macOS), and 1 file to install (an 8 MB static binary)." loading="lazy"></picture></a>
+<a href="docs/checks.md#gh-dark-mode-only"><picture><source media="(max-width: 767px)" srcset="docs/readme/numbers-dark-phone.webp 3x"><source srcset="docs/readme/numbers-dark.webp 2x"><img src="docs/readme/numbers-dark.webp" width="840" alt="Holdfast in five figures: 10 kinds of check (files, ports, URLs, DNS, commands), 4 tools for the agent (remember, recall, verify, retract), 0 dependencies (the Go standard library, nothing else), 1,651 tests (run on Linux and on macOS), and 1 file to install (an 8 MB static binary)." loading="lazy"></picture></a><a href="docs/checks.md#gh-light-mode-only"><picture><source media="(max-width: 767px)" srcset="docs/readme/numbers-light-phone.webp 3x"><source srcset="docs/readme/numbers-light.webp 2x"><img src="docs/readme/numbers-light.webp" width="840" alt="Holdfast in five figures: 10 kinds of check (files, ports, URLs, DNS, commands), 4 tools for the agent (remember, recall, verify, retract), 0 dependencies (the Go standard library, nothing else), 1,651 tests (run on Linux and on macOS), and 1 file to install (an 8 MB static binary)." loading="lazy"></picture></a>
 
 <sub>The tests are the Go test cases, run with the race detector on Linux and once more on macOS, plus the page's own. The binary is the stripped linux/amd64 build on the releases page, with the ledger inside. Every picture here is the real page of <code>holdfast serve --demo</code> or the real output of the binary, taken by <code>make shots</code>.</sub>
 
@@ -77,7 +77,7 @@ Store that as a fact, together with the check that proves it:
 ```console
 $ holdfast add "Go is pinned to 1.24" --check 'contains go.mod "go 1.24"'
 Stored, and proved just now.
-HOLDS     f-s73tp8  Go is pinned to 1.24
+HOLDS     f-eewh8d  Go is pinned to 1.24
           proof: go.mod contains "go 1.24" (line 3) · checked just now
 ```
 
@@ -88,7 +88,7 @@ $ printf 'module example.com/atlas\n\ngo 1.25\n' > go.mod
 $ holdfast recall "which go version do we use"
 1 fact: 1 broken.
 
-BROKEN    f-s73tp8  Go is pinned to 1.24
+BROKEN    f-eewh8d  Go is pinned to 1.24
           proof failed: go.mod does not contain "go 1.24" · checked just now · it last held just now
           check: contains go.mod "go 1.24"
 
@@ -98,14 +98,14 @@ BROKEN: this was true once and is not now. Do not rely on it. If you find out wh
 Store what is true now, in place of the old fact:
 
 ```console
-$ holdfast add "Go is pinned to 1.25" --check 'contains go.mod "go 1.25"' --replaces f-s73tp8
+$ holdfast add "Go is pinned to 1.25" --check 'contains go.mod "go 1.25"' --replaces f-eewh8d
 Stored, and proved just now.
-HOLDS     f-c7md2v  Go is pinned to 1.25
+HOLDS     f-y5ebwq  Go is pinned to 1.25
           proof: go.mod contains "go 1.25" (line 3) · checked just now
 $ holdfast list
 1 fact: 1 holds.
 
-HOLDS     f-c7md2v  Go is pinned to 1.25
+HOLDS     f-y5ebwq  Go is pinned to 1.25
           proof: go.mod contains "go 1.25" (line 3) · checked just now
 ```
 
@@ -157,7 +157,7 @@ Every push runs [`ci.yml`](.github/workflows/ci.yml), and each step also runs on
 
 | Check | What it covers |
 | --- | --- |
-| `go test -race` | 1,610 test cases and 5 fuzz targets: the check grammar and every kind of check, path and network confinement, the policy and its approval, the journal and its locking between processes, recall and its ranking, the time budgets, both forms of the MCP protocol, the web API and its protections, the demo's pretend machine, and the command line |
+| `go test -race` | 1,614 test cases and 5 fuzz targets: the check grammar and every kind of check, path and network confinement, the policy and its approval, the journal and its locking between processes, recall and its ranking, the time budgets, both forms of the MCP protocol, the web API and its protections, the demo's pretend machine, and the command line |
 | The same tests on macOS | File locking and path resolution differ there, so the Go tests run on a macOS runner before a macOS binary is published |
 | `vitest` and `tsc` | 37 tests: the page's reading of statuses, ages and evidence, the engine's answers as they arrive, the check grammar it shows (guarded against drifting from the engine's), and its filters |
 | [`e2e`](e2e) | 5 scenarios against the binary that ships: a person at the command line, an agent over the pipe with and without a handshake, facts travelling through `git clone` while the proof stays home, and the ledger answering only its own page |

@@ -238,11 +238,84 @@ var cgnat = netip.MustParsePrefix("100.64.0.0/10") // carrier NAT and overlay ne
 // shown to people and agents as the evidence of a blocked fact.
 type Blocked struct{ Why, Fix string }
 
+// told comes between the reason and the line a person can run.
+const told = ". A person can allow it: "
+
 func (b *Blocked) Error() string {
 	if b.Fix == "" {
 		return b.Why
 	}
-	return b.Why + ". A person can allow it: " + b.Fix
+	return b.Why + told + b.Fix
+}
+
+// leastWhy is how much of the reason is always kept: enough to say what was
+// refused.
+const leastWhy = 60
+
+// Within returns the refusal in at most max runes. What gives way is the
+// reason, where the path or the address loses its middle, and never the line
+// a person would paste: a command that lost its end is a different command.
+// When the line does not fit beside the reason, none is suggested.
+func (b *Blocked) Within(max int) *Blocked {
+	if b.Fix == "" || len([]rune(b.Error())) <= max {
+		return b
+	}
+	out := *b
+	room := max - len([]rune(told+b.Fix))
+	if room < leastWhy {
+		out.Fix = "by hand only. The line that would allow it is too long to suggest, so the rule must be written into the policy file"
+		room = max - len([]rune(told+out.Fix))
+	}
+	out.Why = shorten(b.Why, room)
+	return &out
+}
+
+// leastWord is how much of a word shorten leaves: enough of each end of a
+// path or an address to tell which one it was.
+const leastWord = 12
+
+// shorten cuts a reason to at most n runes. Its longest word is the path or
+// the address it is about, and that word is what loses its middle, so the
+// sentence around it still reads. A reason with no word long enough to take
+// the cut loses its own middle.
+func shorten(why string, n int) string {
+	r := []rune(why)
+	over := len(r) - n
+	if over <= 0 {
+		return why
+	}
+	start, size := 0, 0
+	for i := 0; i < len(r); {
+		for i < len(r) && unicode.IsSpace(r[i]) {
+			i++
+		}
+		j := i
+		for j < len(r) && !unicode.IsSpace(r[j]) {
+			j++
+		}
+		if j-i > size {
+			start, size = i, j-i
+		}
+		i = j
+	}
+	if size-over < leastWord {
+		return middle(why, n)
+	}
+	return string(r[:start]) + middle(string(r[start:start+size]), size-over) + string(r[start+size:])
+}
+
+// middle cuts s to at most n runes by taking out its middle, so that both
+// ends can still be read.
+func middle(s string, n int) string {
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+	if n < 1 {
+		return ""
+	}
+	head := (n - 1) / 2
+	return string(r[:head]) + "…" + string(r[len(r)-(n-1-head):])
 }
 
 // Outside is the refusal for a path that none of the allowed folders holds.

@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/gallowforge/holdfast/internal/engine"
+	"github.com/gallowforge/holdfast/internal/fact"
+	"github.com/gallowforge/holdfast/internal/policy"
 )
 
 const (
@@ -72,8 +74,20 @@ func stocked(t *testing.T) *stock {
 func (s *stock) blockedText() string {
 	file := filepath.Join(s.outside, "data.txt")
 	return "BLOCKED   " + s.blocked.ID + "  The data is there\n" +
-		pad + "not checked: " + file + " is outside the folders the policy allows. A person can allow it: holdfast allow files " + s.outside + "\n" +
+		pad + "not checked: " + s.refusal() + "\n" +
 		pad + "check: file " + file
+}
+
+// refusal is the evidence of the blocked fact. Where temporary folders have
+// long paths, as on macOS, the line would pass the length evidence is kept
+// to, and its reason is then shortened so that the command stays whole.
+func (s *stock) refusal() string {
+	file := filepath.Join(s.outside, "data.txt")
+	line := file + " is outside the folders the policy allows. A person can allow it: holdfast allow files " + s.outside
+	if len([]rune(line)) > fact.MaxDetail {
+		line = policy.Outside(file, s.outside).Within(fact.MaxDetail).Error()
+	}
+	return line
 }
 
 // breakGo makes the proved fact untrue.
@@ -974,12 +988,11 @@ func TestExportWritesTheFactsAsMarkdown(t *testing.T) {
 
 	s := stocked(t)
 	got := s.ok("export")
-	file := filepath.Join(s.outside, "data.txt")
 	want := "# What Holdfast knows\n\n" +
 		"3 facts: 1 blocked, 1 unproven, 1 holds. Statuses are as of each fact's last check; run `holdfast check` to prove them again.\n\n" +
 		"## Could not be checked\n\n" +
 		"- **The data is there** (`" + s.blocked.ID + "`)  \n" +
-		"  not checked: " + file + " is outside the folders the policy allows. A person can allow it: holdfast allow files " + s.outside + "\n\n" +
+		"  not checked: " + s.refusal() + "\n\n" +
 		"## Notes nobody has proved\n\n" +
 		"- **Deploys go out on Fridays** (`" + s.note.ID + "`)  \n" +
 		"  a note by alex, under a minute old, with no check\n\n" +

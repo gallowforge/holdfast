@@ -58,6 +58,8 @@ func Run(ctx context.Context, w world.World, p *policy.Policy, c *fact.Check) fa
 	var blocked *policy.Blocked
 	switch {
 	case errors.As(err, &blocked):
+		// A long path must not push the command off the end of the line.
+		blocked = blocked.Within(fact.MaxDetail)
 		ev.Status, ev.Detail = fact.Blocked, blocked.Error()
 		ev.Fix = fact.WholeLine(blocked.Fix, fact.MaxDetail)
 	case err != nil:
