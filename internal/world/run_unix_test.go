@@ -219,6 +219,20 @@ func alive(pid int) bool {
 	return true
 }
 
+// gone reports whether a process has stopped running, or does within a
+// moment. A process that was killed lets go of what it held open before it is
+// marked as ended, so for an instant after Run is back it can still look
+// alive. One that was never stopped is still there long after.
+func gone(pid int) bool {
+	for end := time.Now().Add(2 * time.Second); alive(pid); {
+		if time.Now().After(end) {
+			return false
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	return true
+}
+
 // When time runs out the command is stopped together with everything it
 // started, and Run comes back at once rather than waiting for them.
 func TestRunTimeoutStopsTheWholeFamily(t *testing.T) {
@@ -244,7 +258,7 @@ func TestRunTimeoutStopsTheWholeFamily(t *testing.T) {
 		if err != nil || pid <= 1 {
 			t.Fatalf("output = %q", out)
 		}
-		if alive(pid) {
+		if !gone(pid) {
 			syscall.Kill(pid, syscall.SIGKILL)
 			t.Errorf("process %d of the command (%d) was still running after the timeout", i+1, pid)
 		}
