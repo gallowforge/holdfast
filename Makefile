@@ -2,7 +2,7 @@
 # make test       Go and page tests
 # make release    static binaries for Linux and macOS in dist/
 # make pages      the live demo as a static site in pages/ (the engine as WebAssembly)
-# make shots      the README's pictures, taken from the running demo
+# make shots      the README's pictures: the running demo and real command-line sessions, staged as glass
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X main.version=$(VERSION)
 TARGETS := linux/amd64 linux/arm64 darwin/arm64 darwin/amd64
@@ -40,4 +40,4 @@ release: ui
 	cd dist && sha256sum holdfast-* > SHA256SUMS
 
 shots: build
-	cd docs/readme/src && npm ci --no-audit --no-fund && node shots.mjs ../../../bin/holdfast
+	cd docs/readme/src && npm ci --no-audit --no-fund && ./build.sh ../../../bin/holdfast

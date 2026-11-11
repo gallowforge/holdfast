@@ -3,6 +3,7 @@
 /pages/
 /web/node_modules/
 /docs/readme/src/node_modules/
+/docs/readme/build/
 /internal/web/dist/*
 !/internal/web/dist/.gitkeep
 *.test

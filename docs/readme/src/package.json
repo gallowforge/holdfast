@@ -2,11 +2,12 @@
   "name": "holdfast-readme-pictures",
   "private": true,
   "type": "module",
-  "description": "Takes the README's pictures from the running demo and from real command-line sessions.",
+  "description": "Takes the README's pictures from the running demo and from real command-line sessions, and stages them as glass scenes.",
   "scripts": {
-    "shots": "node shots.mjs ../../../bin/holdfast"
+    "shots": "./build.sh ../../../bin/holdfast"
   },
   "devDependencies": {
-    "playwright": "1.65.0"
+    "playwright": "1.65.0",
+    "three": "0.170.0"
   }
 }
