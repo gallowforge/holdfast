@@ -259,6 +259,7 @@ svg { display: block; flex: none; }
   font-weight: 660;
   font-stretch: 84%;
   letter-spacing: -0.012em;
+  word-spacing: 0.07em; /* the narrow cut closes the gap after an r: "longer true" read as one word */
   text-wrap: balance;
 }
 .headline.t-broken { color: var(--broken); }
