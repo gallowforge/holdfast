@@ -6,7 +6,7 @@ export type Mode = 'system' | 'light' | 'dark'
 
 const KEY = 'holdfast:theme'
 /** The page ground in each theme, for the browser's own chrome. Keep in step with styles.css. */
-const GROUND = { light: '#f5f7f8', dark: '#0e1316' } as const
+const GROUND = { light: '#f4f7f9', dark: '#0a1014' } as const
 
 function stored(): Mode {
   try {

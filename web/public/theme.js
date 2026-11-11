@@ -11,5 +11,5 @@
   var light = mode === 'light' || (mode !== 'dark' && window.matchMedia('(prefers-color-scheme: light)').matches)
   document.documentElement.dataset.theme = light ? 'light' : 'dark'
   var meta = document.querySelector('meta[name="theme-color"]')
-  if (meta) meta.setAttribute('content', light ? '#f5f7f8' : '#0e1316')
+  if (meta) meta.setAttribute('content', light ? '#f4f7f9' : '#0a1014')
 })()

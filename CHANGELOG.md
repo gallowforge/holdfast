@@ -4,6 +4,14 @@
 
 Nothing yet.
 
+## 0.1.1
+
+Three repairs to the ledger's page. Nothing changes on the command line or for an agent.
+
+- **The headline keeps its word gaps.** The narrow type it is set in closed the gap after an r, so "no longer true" read as "no longertrue".
+- **A hovered row is the page's own grey.** Pointing at a fact turned its row maroon in the dark theme and pink in the light one. The same fault put a faint red cast on every claim, most of all on a note that is fading, and on the placeholders of the form for a new fact. All three now keep the hue of the page.
+- **The browser's own bar matches the page.** The colour the page hands the browser for its toolbar was a shade off the page's ground in both themes.
+
 ## 0.1.0
 
 The first release.

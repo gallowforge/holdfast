@@ -353,7 +353,10 @@ kbd {
   padding: 11px var(--pad) 12px;
   transition: background-color 100ms;
 }
-.row-main:hover { background: color-mix(in oklch, var(--surface) 55%, var(--bg)); }
+/* Where two of the page's near-greys are mixed (this hovered row, a claim, a form's placeholder) the mix is made
+   in oklab. The build lowers the colour tokens to lab(), and "in oklch" two colours that close to grey have no
+   hue to keep: the hovered row came out maroon in the dark theme and pink in the light one. */
+.row-main:hover { background: color-mix(in oklab, var(--surface) 55%, var(--bg)); }
 .row-main:focus-visible { outline-offset: -2px; }
 .row.is-selected .row-main { background: var(--surface); box-shadow: inset 2px 0 0 var(--tone); }
 .row .glyph { margin-top: 2px; }
@@ -362,7 +365,7 @@ kbd {
   font-size: 14.5px;
   font-weight: 520;
   line-height: 1.35;
-  color: color-mix(in oklch, var(--text) calc(var(--ink, 1) * 100%), var(--bg));
+  color: color-mix(in oklab, var(--text) calc(var(--ink, 1) * 100%), var(--bg));
   overflow-wrap: anywhere;
 }
 .strike {
@@ -605,7 +608,7 @@ kbd {
 }
 .field textarea { resize: vertical; min-height: 76px; }
 .field input.mono { font-size: 13px; }
-.field input::placeholder, .field textarea::placeholder { color: color-mix(in oklch, var(--text-3) 70%, var(--surface)); }
+.field input::placeholder, .field textarea::placeholder { color: color-mix(in oklab, var(--text-3) 70%, var(--surface)); }
 .field input:focus-visible, .field textarea:focus-visible { outline: none; border-color: var(--text-2); }
 .field input[aria-invalid='true'] { border-color: var(--broken); }
 .field small { font-size: 12.5px; line-height: 1.45; color: var(--text-3); }
