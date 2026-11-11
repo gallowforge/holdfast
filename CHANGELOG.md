@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Nothing yet.
+- **Selected text and a note's flash keep the hue of the page.** The highlight behind selected text, and the brief wash on a note whose status has just changed, carried the red cast that the hovered row had before 0.1.1.
 
 ## 0.1.1
 

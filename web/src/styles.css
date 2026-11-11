@@ -98,7 +98,7 @@ code, kbd, pre, time, .mono { font-family: var(--mono); font-feature-settings: '
 code { font-size: 0.93em; }
 svg { display: block; flex: none; }
 .glyph { color: var(--tone, var(--text-3)); }
-::selection { background: color-mix(in oklch, var(--text) 22%, transparent); }
+::selection { background: color-mix(in oklab, var(--text) 22%, transparent); }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--text-2); outline-offset: 2px; border-radius: 4px; }
 * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
@@ -353,9 +353,10 @@ kbd {
   padding: 11px var(--pad) 12px;
   transition: background-color 100ms;
 }
-/* Where two of the page's near-greys are mixed (this hovered row, a claim, a form's placeholder) the mix is made
-   in oklab. The build lowers the colour tokens to lab(), and "in oklch" two colours that close to grey have no
-   hue to keep: the hovered row came out maroon in the dark theme and pink in the light one. */
+/* Where the page's near-greys are mixed (selected text, this hovered row, a claim, the wash on a note, a form's
+   placeholder) the mix is made in oklab. The build lowers the colour tokens to lab(), and "in oklch" a colour
+   that close to grey has no hue to keep: the hovered row came out maroon in the dark theme and pink in the
+   light one. */
 .row-main:hover { background: color-mix(in oklab, var(--surface) 55%, var(--bg)); }
 .row-main:focus-visible { outline-offset: -2px; }
 .row.is-selected .row-main { background: var(--surface); box-shadow: inset 2px 0 0 var(--tone); }
@@ -393,6 +394,13 @@ kbd {
 .row.is-moved.t-broken .strike { animation: strike 620ms 120ms var(--ease) backwards; }
 @keyframes wash {
   from { background-color: color-mix(in oklch, var(--tone) 26%, var(--bg)); }
+  to { background-color: transparent; }
+}
+/* A note's tone is a grey, so its wash is mixed in oklab, as the hovered row is. The coloured washes have a hue to
+   keep and stay as they are. */
+.row.is-moved.t-unproven .row-main { animation-name: wash-grey; }
+@keyframes wash-grey {
+  from { background-color: color-mix(in oklab, var(--tone) 26%, var(--bg)); }
   to { background-color: transparent; }
 }
 @keyframes pop {
